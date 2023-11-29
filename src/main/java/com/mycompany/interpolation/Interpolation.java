@@ -9,7 +9,7 @@ public class Interpolation {
     private static int n;
 
     public static void main(String[] args) {
-        openFile("data-1.txt");
+        openFile("data.txt");
         readInData();
         dividedDiff();
         printTable();
@@ -57,7 +57,7 @@ public class Interpolation {
                 polynomial += " + ";
             for(int j = 0; j < n; j++){
                 if(i!=j){
-                    xTerms+=String.format("(x-%.2f)",x[j]);
+                    xTerms+=String.format("(x-(%.2f))",x[j]);
                     if(first){
                         coef = x[i]-x[j];
                         first = false;
@@ -84,7 +84,7 @@ public class Interpolation {
         for(int i = 1; i < n; i++){
             polynomial += String.format(" + (%.2f)", diffTable[0][i]);
             for(int j = 0; j< i; j++){
-                polynomial += String.format("(x-%.2f)", x[j]);
+                polynomial += String.format("(x-(%.2f))", x[j]);
             }
         }
         System.out.println(polynomial);
