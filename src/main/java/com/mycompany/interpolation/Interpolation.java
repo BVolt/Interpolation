@@ -1,10 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
-
 package com.mycompany.interpolation;
 import java.io.*;
-import java.util.*;
 
 public class Interpolation {
     private static BufferedReader inFile;
@@ -13,7 +8,6 @@ public class Interpolation {
     private static double[][] diffTable;
     private static int n;
 
-
     public static void main(String[] args) {
         openFile("data-1.txt");
         readInData();
@@ -21,18 +15,49 @@ public class Interpolation {
         printTable();
         newtonForm();
         lagrangeForm();
+        simplify();
+    }
+    
+    public static void simplify(){
+        System.out.println("Simplified Polynomial");
+        System.out.println("-----------------------------------------------------------------------------------------------------------");
+        String polynomial;
+        double[] coef = new double[n];
+        
+        for(int i = n-1; i > -1; i--){
+            if(i != 0){
+                coef[i] = diffTable[0][i];
+                coef[i-1] = diffTable[0][i] * -x[i-1];
+            }
+            else
+                coef[i] = diffTable[0][i];
+        }
+        polynomial = String.format("%.2f", coef[0]);
+        for(int i = 1; i < coef.length; i++){
+            polynomial += String.format(" + (%.2f)x", coef[i]);
+            if(i>1)
+                polynomial += String.format("^%d", i);
+            polynomial += " ";
+        }        
+        
+        System.out.println(polynomial);
+        System.out.println("-----------------------------------------------------------------------------------------------------------\n");
     }
     
     public static void lagrangeForm(){
-        String polynomial;
+        System.out.println("Langrange Form");
+        System.out.println("-----------------------------------------------------------------------------------------------------------");
+        String polynomial, xTerms;
         double coef=0;
         polynomial = "";
+        xTerms = "";
         boolean first = true;
         for(int i = 0; i < n; i++){
-            
+            if(i > 0)
+                polynomial += " + ";
             for(int j = 0; j < n; j++){
-                
                 if(i!=j){
+                    xTerms+=String.format("(x-%.2f)",x[j]);
                     if(first){
                         coef = x[i]-x[j];
                         first = false;
@@ -42,13 +67,18 @@ public class Interpolation {
                     }
                 }
             }
-            System.out.println(diffTable[0][i]/coef);
+            coef = y[i]/coef;
+            polynomial += String.format("(%.2f)%s", coef, xTerms);
             first = true;
+            xTerms = "";
         }
         System.out.println(polynomial);
+        System.out.println("-----------------------------------------------------------------------------------------------------------\n");
     }
     
     public static void newtonForm(){
+        System.out.println("Newton Form");
+        System.out.println("-----------------------------------------------------------------------------------------------------------");
         String polynomial;
         polynomial = String.format("%.2f", diffTable[0][0]);
         for(int i = 1; i < n; i++){
@@ -58,6 +88,7 @@ public class Interpolation {
             }
         }
         System.out.println(polynomial);
+        System.out.println("-----------------------------------------------------------------------------------------------------------\n");
     }
     
     public static void printTable(){
