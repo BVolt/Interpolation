@@ -24,7 +24,28 @@ public class Interpolation {
     }
     
     public static void lagrangeForm(){
-        
+        String polynomial;
+        double coef=0;
+        polynomial = "";
+        boolean first = true;
+        for(int i = 0; i < n; i++){
+            
+            for(int j = 0; j < n; j++){
+                
+                if(i!=j){
+                    if(first){
+                        coef = x[i]-x[j];
+                        first = false;
+                    }
+                    else{
+                        coef*= x[i]-x[j]; 
+                    }
+                }
+            }
+            System.out.println(diffTable[0][i]/coef);
+            first = true;
+        }
+        System.out.println(polynomial);
     }
     
     public static void newtonForm(){
