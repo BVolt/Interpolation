@@ -1,5 +1,6 @@
 package com.mycompany.interpolation;
 import java.io.*;
+import java.util.*;
 
 public class Interpolation {
     private static BufferedReader inFile;
@@ -18,32 +19,61 @@ public class Interpolation {
         simplify();
     }
     
-    public static void simplify(){
+    public static void simplify() {
         System.out.println("Simplified Polynomial");
         System.out.println("-----------------------------------------------------------------------------------------------------------");
-        String polynomial;
-        double[] coef = new double[n];
+        Map<Integer, Double> polynomialTerms = new HashMap<>();
         
-        for(int i = n-1; i > -1; i--){
-            if(i != 0){
-                coef[i] = diffTable[0][i];
-                coef[i-1] = diffTable[0][i] * -x[i-1];
+        polynomialTerms.put(0, diffTable[0][0]);
+        for (int i = 1; i < n; i++) {
+            Map<Integer, Double> currentTerm = new HashMap<>();
+            currentTerm.put(0, diffTable[0][i]);
+
+            for (int j = 0; j < i; j++) {
+                currentTerm = expandTerm(currentTerm, x[j]);
             }
-            else
-                coef[i] = diffTable[0][i];
+
+            for (Map.Entry<Integer, Double> entry : currentTerm.entrySet()) {
+                polynomialTerms.merge(entry.getKey(), entry.getValue(), Double::sum);
+            }
         }
-        polynomial = String.format("%.2f", coef[0]);
-        for(int i = 1; i < coef.length; i++){
-            polynomial += String.format(" + (%.2f)x", coef[i]);
-            if(i>1)
-                polynomial += String.format("^%d", i);
-            polynomial += " ";
-        }        
-        
+
+        StringBuilder polynomial = new StringBuilder();
+        polynomialTerms.entrySet().stream()
+                .sorted(Map.Entry.<Integer, Double>comparingByKey().reversed())
+                .forEach(entry -> {
+                    double coef = entry.getValue();
+                    int power = entry.getKey();
+                    if (coef >= 0 && polynomial.length() > 0) {
+                        polynomial.append(" + ");
+                    }
+                    if (coef < 0) {
+                        polynomial.append(" - ");
+                    }
+                    polynomial.append(String.format("%.2f", Math.abs(coef)));
+                    if (power > 0) {
+                        polynomial.append("x");
+                    }
+                    if (power > 1) {
+                        polynomial.append("^").append(power);
+                    }
+                });
+
         System.out.println(polynomial);
         System.out.println("-----------------------------------------------------------------------------------------------------------\n");
     }
-    
+
+    private static Map<Integer, Double> expandTerm(Map<Integer, Double> term, double xi) {
+        Map<Integer, Double> expanded = new HashMap<>();
+
+        term.forEach((power, coefficient) -> {
+            expanded.merge(power + 1, coefficient, Double::sum);
+            expanded.merge(power, -xi * coefficient, Double::sum);
+        });
+
+        return expanded;
+    }
+
     public static void lagrangeForm(){
         System.out.println("Langrange Form");
         System.out.println("-----------------------------------------------------------------------------------------------------------");
